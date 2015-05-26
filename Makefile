@@ -1,3 +1,3 @@
 PROJECT = teckel
-DEPS = cowboy eredis
+DEPS = cowboy eredis jiffy
 include erlang.mk
