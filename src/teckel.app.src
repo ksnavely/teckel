@@ -9,8 +9,7 @@
 		stdlib,
                 cowboy,
                 eredis,
-                inets,
-                ssl
+                jiffy
 	]},
 	{mod, {teckel_app, []}},
 	{env, []}
