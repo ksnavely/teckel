@@ -12,11 +12,15 @@ init(_, Req, _Opts) ->
 	{ok, Req, #state{}}.
 
 handle(Req, State=#state{}) ->
-        {ok, Req2} = cowboy_req:reply(200,
+        {ok, Body, Req2} = cowboy_req:body(Req),
+        {Json} = jiffy:decode(Body),
+        User = teckel_util:get_value(<<"username">>, Json),
+        Score = teckel_util:get_value(<<"score">>, Json),
+        {ok, Req3} = cowboy_req:reply(200,
             [{<<"content-type">>, <<"text/plain">>}],
-            <<"Hello Score!">>,
-            Req),
-	{ok, Req2, State}.
+            io_lib:format("Nice high score ~s: ~s", [User, Score]),
+            Req2),
+	{ok, Req3, State}.
 
 terminate(_Reason, _Req, _State) ->
 	ok.
