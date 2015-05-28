@@ -12,15 +12,28 @@ init(_, Req, _Opts) ->
 	{ok, Req, #state{}}.
 
 handle(Req, State=#state{}) ->
-        {ok, Body, Req2} = cowboy_req:body(Req),
-        {Json} = jiffy:decode(Body),
-        User = teckel_util:get_value(<<"username">>, Json),
-        Score = teckel_util:get_value(<<"score">>, Json),
-        {ok, Req3} = cowboy_req:reply(200,
-            [{<<"content-type">>, <<"text/plain">>}],
-            io_lib:format("Nice high score ~s: ~s", [User, Score]),
-            Req2),
-	{ok, Req3, State}.
+	{ok, Body, Req2} = cowboy_req:body(Req),
+	{Method, Req3} = cowboy_req:method(Req2),
+	{ok, Req4} = case Method of
+		<<"POST">> ->
+			{Json} = jiffy:decode(Body),
+			Username = teckel_util:get_value(<<"username">>, Json),
+			Score = teckel_util:get_value(<<"score">>, Json),
+			gen_server:call(database_server, {new_score, Username, Score}),
+			cowboy_req:reply(
+				200,
+				[{<<"content-type">>, <<"application/json">>}],
+				"{\"ok\": true}",
+				Req3);
+		_ -> 
+			io_lib:format("score_hanlder: Invalid HTTP Method ~s", [Method]),
+			cowboy_req:reply(
+				400,
+				[{<<"content-type">>, <<"application/json">>}],
+				"{\"error\": \"This endpoint accepts only POST requests.\"}",
+				Req3)
+    end,
+  {ok, Req4, State}.
 
 terminate(_Reason, _Req, _State) ->
 	ok.
