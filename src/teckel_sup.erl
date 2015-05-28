@@ -8,5 +8,13 @@ start_link() ->
 	supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-	Procs = [],
-	{ok, {{one_for_one, 1, 5}, Procs}}.
+	Children = [{                                                                  
+		database_server,              % Id                                            
+		{database_server, start, []}, % {Module, Function, Arguments}                 
+		temporary,                 % RestartStrategy                               
+		brutal_kill,               % ShutdownStrategy                              
+		worker,                    % worker or supervisor                          
+		[database_server]             % ModuleList which implements the process       
+	}],                                                                            
+	% {ok, {{RestartStrategy, AllowedRestarts, MaxSeconds}, ChildSpecificationList}}
+	{ok, {{one_for_one, 5, 10}, Children}}.
