@@ -31,9 +31,17 @@ start() ->
 %% Server OTP callbacks below                                                      
 
 handle_call({new_score, Username, Score}, _From, RedisPid) ->
+  % Set the user's score in Redis.
   {ok, <<"OK">>} = eredis:q(RedisPid, ["SET", Username, Score]),
-  {reply, ok, RedisPid}.
-                                                                                   
+  {reply, ok, RedisPid};
+handle_call({current_score, Username}, _From, RedisPid) ->
+  io:format("username: ~s", [Username]),
+  % Get the user's score in Redis, convert back to int
+  {ok, Score} = eredis:q(RedisPid, ["GET", Username]),
+  Score2 = binary_to_list(Score),
+  io:format("score: ~s", [Score]),
+  {reply, Score2, RedisPid}.
+
 init(_Args) ->                                                                     
   % Prepare the database for usage.
   {ok, RedisPid} = eredis:start_link(),
