@@ -34,6 +34,7 @@ handle_call({new_score, Username, Score}, _From, RedisPid) ->
   % Set the user's score in Redis.
   {ok, <<"OK">>} = eredis:q(RedisPid, ["SET", Username, Score]),
   {reply, ok, RedisPid};
+
 handle_call({current_score, Username}, _From, RedisPid) ->
   io:format("username: ~s", [Username]),
   % Get the user's score in Redis, convert back to int

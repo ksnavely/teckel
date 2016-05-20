@@ -12,12 +12,12 @@ init(_, Req, _Opts) ->
 	{ok, Req, #state{}}.
 
 handle(Req, State=#state{}) ->
-	{ok, Body, Req2} = cowboy_req:body(Req),
-	{Method, Req3} = cowboy_req:method(Req2),
-	{ok, FinalReq} = case Method of
+    {ok, Body, Req2} = cowboy_req:body(Req),
+    {Method, Req3} = cowboy_req:method(Req2),
+    {ok, FinalReq} = case Method of
 		<<"POST">> ->
 			{Json} = jiffy:decode(Body),
-      {Username, Req4} = cowboy_req:binding(username, Req3),
+            {Username, Req4} = cowboy_req:binding(username, Req3),
 			Score = teckel_util:get_value(<<"score">>, Json),
 			gen_server:call(database_server, {new_score, Username, Score}),
 			cowboy_req:reply(
@@ -26,7 +26,7 @@ handle(Req, State=#state{}) ->
 				"{\"ok\": true}",
 				Req4);
 		<<"GET">> ->
-      {Username, Req4} = cowboy_req:binding(username, Req3),
+            {Username, Req4} = cowboy_req:binding(username, Req3),
 			Score = gen_server:call(database_server, {current_score, Username}),
 			cowboy_req:reply(
 				200,
