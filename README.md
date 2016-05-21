@@ -4,23 +4,33 @@ Simple leaderboard middleware
 ## Usage:
   - have an Erlang install working, e.g. 18.3
   - have Redis running on port 6379 (default)
-  - `erl -pa ./ebin ./deps/*/ebin` so Erlang can see the application and deps
-  - `application:ensure_all_started(teckel).`
 
-Example:
 ```
-curl localhost:8080
-Hello Erlang!
+# Build the release
+make
 
-curl -X POST -H 'Content-Type: application/json' -d '{"score": 1337}' localhost:8080/user/kyle/score
+# Start the server
+make run
+
+# In another window
+$> curl localhost:8080
+{"hello": "teckel!"}
+
+$> curl -X POST -H 'Content-Type: application/json' -d '{"score": 1337}' localhost:8080/user/kyle/score
 {"ok": true}
 
-curl localhost:8080/user/kyle/score
+$> curl -X POST -H 'Content-Type: application/json' -d '{"score": 999999999}' localhost:8080/user/emily/score
+{"ok": true}
+
+$> curl localhost:8080/user/kyle/score
 {"score": 1337}
+
+$> curl localhost:8080/user/emily/score
+{"score": 999999999}
+
+$> curl localhost:8080/top_scores
+{"top_scores": {"emily":"999999999","kyle":"1337"}}
 ```
 
 TODO:
- - accept GET /leaderboard and return top 10 scores
- - Ansible playbook to provision deploy teckel and redis
  - POC using rockfall
- - Blog post
