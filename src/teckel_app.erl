@@ -9,7 +9,8 @@ start(_Type, _Args) ->
   Dispatch = cowboy_router:compile([
     {'_', [
       {"/", root_handler, []},
-      {"/user/:username/score", score_handler, []}
+      {"/user/:username/score", score_handler, []},
+      {"/top_scores", ranking_handler, []}
     ]}
   ]),
   {ok, _} = cowboy:start_http(my_http_listener, 100, [{port, 8080}],
@@ -18,4 +19,4 @@ start(_Type, _Args) ->
   teckel_sup:start_link().
 
 stop(_State) ->
-	ok.
+    ok.
